@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { searchProductsByIntent } from '../graph/graphService';
 import { Product } from '../models/product.model';
-import { Shop } from '../models/shop.model';
 
 interface ProductResult {
     productId: string;
@@ -24,29 +23,62 @@ export const graphSearch = async (req: Request, res: Response): Promise<void> =>
     }
 
     try {
-        // 1. Get product names from Neo4j graph
-        const graphResult = await searchProductsByIntent(query);
-        const productNames = graphResult.products;
+        let graphProductNames: string[] = [];
+        let intent = `Results for "${query}"`;
 
-        if (productNames.length === 0) {
-            res.status(200).json({ intent: graphResult.intent, products: [] });
-            return;
+        // 1. Try Neo4j graph intent search safely (non-blocking if Neo4j is paused or offline)
+        try {
+            const graphResult = await searchProductsByIntent(query);
+            if (graphResult && Array.isArray(graphResult.products) && graphResult.products.length > 0) {
+                graphProductNames = graphResult.products;
+                if (graphResult.intent) {
+                    intent = graphResult.intent;
+                }
+            }
+        } catch (graphError) {
+            console.warn('Neo4j graph search offline/unavailable, falling back to database search:', graphError);
         }
 
-        // 2. Fetch full product details from MongoDB (name, price, shop)
+        // 2. Build MongoDB query conditions
+        // Search by:
+        // - Graph product names (if any matched)
+        // - Direct match on product name, category, description, keywords
+        const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const queryRegex = new RegExp(escapedQuery, 'i');
+        const tokens = query.split(/\s+/).filter(t => t.length > 1);
+
+        const orConditions: any[] = [
+            { name: queryRegex },
+            { category: queryRegex },
+            { description: queryRegex },
+            { keywords: { $in: [queryRegex] } },
+        ];
+
+        if (graphProductNames.length > 0) {
+            orConditions.push({ name: { $in: graphProductNames } });
+        }
+
+        tokens.forEach(tok => {
+            const tokRegex = new RegExp(tok.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+            orConditions.push({ name: tokRegex });
+            orConditions.push({ category: tokRegex });
+        });
+
+        // 3. Fetch products from MongoDB
         const mongoProducts = await Product.find({
-            name: { $in: productNames },
+            $or: orConditions,
             stock: { $gt: 0 },
         }).populate('shop', 'name address location isOpen');
 
-        // 3. Build enriched product list with shop info + distance
+        // 4. Build enriched product list with shop info + distance
         const enriched: ProductResult[] = [];
         for (const p of mongoProducts) {
             const shop = p.shop as any;
-            if (!shop || !shop.isOpen) continue;
+            // Skip only if shop does not exist or is explicitly closed
+            if (!shop || shop.isOpen === false) continue;
 
             let distance: number | undefined;
-            if (buyerLat != null && buyerLng != null && shop.location?.coordinates) {
+            if (buyerLat != null && buyerLng != null && shop.location?.coordinates && shop.location.coordinates.length >= 2) {
                 const [shopLng, shopLat] = shop.location.coordinates;
                 distance = haversineKm(buyerLat, buyerLng, shopLat, shopLng);
             }
@@ -55,30 +87,33 @@ export const graphSearch = async (req: Request, res: Response): Promise<void> =>
                 productId: p._id.toString(),
                 name: p.name,
                 price: p.price,
-                shopName: shop.name,
+                shopName: shop.name || 'Local Shop',
                 shopId: shop._id.toString(),
                 distance,
                 stock: p.stock || 0,
             });
         }
 
-        // 4. Deduplicate: if same product at same price from multiple shops,
+        // 5. Deduplicate: if same product at same price from multiple shops,
         //    keep only the nearest shop's entry
         const deduped = deduplicateProducts(enriched);
 
-        // 5. Sort: nearest first (if distance available), then by name
+        // 6. Sort: nearest first (if distance available), then by name
         deduped.sort((a, b) => {
             if (a.distance != null && b.distance != null) return a.distance - b.distance;
             return a.name.localeCompare(b.name);
         });
 
         res.status(200).json({
-            intent: graphResult.intent,
+            intent,
             products: deduped,
         });
     } catch (error) {
-        console.error('Graph search error:', error);
-        res.status(500).json({ message: 'Failed to perform graph search' });
+        console.error('Search error:', error);
+        res.status(200).json({
+            intent: `Results for "${query}"`,
+            products: [],
+        });
     }
 };
 
@@ -91,7 +126,7 @@ function deduplicateProducts(products: ProductResult[]): ProductResult[] {
     const map = new Map<string, ProductResult>(); // key: "name|price"
 
     for (const p of products) {
-        const key = `${p.name}|${p.price}`;
+        const key = `${p.name.toLowerCase().trim()}|${p.price}`;
         const existing = map.get(key);
         if (!existing) {
             map.set(key, p);
