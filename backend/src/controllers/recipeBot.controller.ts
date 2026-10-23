@@ -37,8 +37,9 @@ export const handleRecipeChat = async (req: Request, res: Response): Promise<voi
 
     try {
         const genAI = getGenAI();
+        const modelName = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
         const model = genAI.getGenerativeModel({
-            model: "gemini-flash-latest",
+            model: modelName,
             // Use structured output capabilities
             generationConfig: {
                 responseMimeType: "application/json",
@@ -135,10 +136,28 @@ export const handleRecipeChat = async (req: Request, res: Response): Promise<voi
         const missingIngredients: string[] = [];
 
         for (const item of (ingredients as ExtractedIngredient[])) {
-            // Find products matching the ingredient name (case-insensitive regex)
-            const regex = new RegExp(item.name.split(' ')[0], 'i'); // Split by space to match terms better (e.g. 'Red Tomato' -> 'Red')
+            // Find products matching the ingredient name or keywords/category
+            const escapedName = item.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const nameRegex = new RegExp(escapedName, 'i');
+            const tokens = item.name.split(/\s+/).filter(t => t.length > 2);
+
+            const orConditions: any[] = [
+                { name: nameRegex },
+                { category: nameRegex },
+                { keywords: nameRegex },
+                { similarTo: nameRegex },
+            ];
+
+            tokens.forEach(tok => {
+                const tokRegex = new RegExp(tok.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+                orConditions.push({ name: tokRegex });
+                orConditions.push({ category: tokRegex });
+                orConditions.push({ keywords: tokRegex });
+                orConditions.push({ similarTo: tokRegex });
+            });
+
             const products = await Product.find({
-                name: { $regex: regex },
+                $or: orConditions,
                 stock: { $gt: 0 }
             }).populate('shop', 'name address location isOpen');
 
@@ -147,7 +166,7 @@ export const handleRecipeChat = async (req: Request, res: Response): Promise<voi
 
             for (const p of products) {
                 const shop = p.shop as any;
-                if (!shop || !shop.isOpen) continue;
+                if (!shop || shop.isOpen === false) continue;
 
                 let dist = Infinity;
                 if (buyerLat != null && buyerLng != null && shop.location?.coordinates) {
