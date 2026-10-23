@@ -51,7 +51,8 @@ export const graphSearch = async (req: Request, res: Response): Promise<void> =>
             { name: queryRegex },
             { category: queryRegex },
             { description: queryRegex },
-            { keywords: { $in: [queryRegex] } },
+            { keywords: queryRegex },
+            { similarTo: queryRegex },
         ];
 
         if (graphProductNames.length > 0) {
@@ -62,6 +63,8 @@ export const graphSearch = async (req: Request, res: Response): Promise<void> =>
             const tokRegex = new RegExp(tok.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
             orConditions.push({ name: tokRegex });
             orConditions.push({ category: tokRegex });
+            orConditions.push({ keywords: tokRegex });
+            orConditions.push({ similarTo: tokRegex });
         });
 
         // 3. Fetch products from MongoDB

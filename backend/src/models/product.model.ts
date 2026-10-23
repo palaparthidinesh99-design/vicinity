@@ -8,6 +8,7 @@ export interface IProduct extends Document {
     shop: mongoose.Types.ObjectId;
     stock: number;
     keywords: string[];
+    similarTo: string[];
 }
 
 const productSchema = new Schema<IProduct>(
@@ -19,14 +20,15 @@ const productSchema = new Schema<IProduct>(
         shop: { type: Schema.Types.ObjectId, ref: 'Shop', required: true },
         stock: { type: Number, default: 0 },
         keywords: [{ type: String }],
+        similarTo: [{ type: String }],
     },
     { timestamps: true }
 );
 
 // Search optimization
 productSchema.index(
-    { name: 'text', description: 'text', keywords: 'text' },
-    { weights: { name: 10, keywords: 5, description: 1 } }
+    { name: 'text', description: 'text', keywords: 'text', similarTo: 'text' },
+    { weights: { name: 10, keywords: 5, similarTo: 5, description: 1 } }
 );
 
 export const Product = mongoose.model<IProduct>('Product', productSchema);

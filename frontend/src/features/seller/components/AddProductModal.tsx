@@ -48,9 +48,9 @@ export function AddProductModal({ isOpen, onClose, onProductAdded, shopId }: Add
             return;
         }
 
-        // Parse "similar to" into array
+        // Parse "similar to" into array (supports comma and space separation)
         const similarCategories = similarTo
-            .split(',')
+            .split(/[\s,]+/)
             .map(s => s.trim())
             .filter(s => s.length > 0);
 

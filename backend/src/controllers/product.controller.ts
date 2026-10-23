@@ -58,6 +58,18 @@ export const addProduct = async (req: Request, res: Response): Promise<void> => 
             }
         }
 
+        // Process similarTo keywords (support array, comma-separated, space-separated)
+        const parsedSimilarTo: string[] = Array.isArray(similarTo)
+            ? similarTo.flatMap(s => String(s).split(/[\s,]+/)).map(s => s.trim().toLowerCase()).filter(Boolean)
+            : typeof similarTo === 'string'
+            ? similarTo.split(/[\s,]+/).map(s => s.trim().toLowerCase()).filter(Boolean)
+            : [];
+
+        const combinedKeywords = Array.from(new Set([
+            ...(Array.isArray(keywords) ? keywords.map((k: string) => k.toLowerCase()) : []),
+            ...parsedSimilarTo,
+        ]));
+
         // Save to MongoDB
         const product = await Product.create({
             name,
@@ -66,7 +78,8 @@ export const addProduct = async (req: Request, res: Response): Promise<void> => 
             category,
             shop: shop._id,
             stock: Number(stock) || 0,
-            keywords: keywords || [],
+            keywords: combinedKeywords,
+            similarTo: parsedSimilarTo,
         });
 
         // Sync to Neo4j graph (non-fatal: product is safely in MongoDB even if graph is unreachable)
