@@ -12,8 +12,14 @@ export const getCategories = async (_req: Request, res: Response): Promise<void>
         const categories = await getGraphCategories();
         res.json({ categories });
     } catch (error) {
-        console.error('Error fetching categories:', error);
-        res.status(500).json({ message: 'Failed to fetch categories' });
+        console.warn('Neo4j categories unavailable, falling back to MongoDB:', error);
+        try {
+            const mongoCategories = await Product.distinct('category');
+            res.json({ categories: mongoCategories });
+        } catch (mongoErr) {
+            console.error('Error fetching categories from MongoDB:', mongoErr);
+            res.status(500).json({ message: 'Failed to fetch categories' });
+        }
     }
 };
 
@@ -63,16 +69,20 @@ export const addProduct = async (req: Request, res: Response): Promise<void> => 
             keywords: keywords || [],
         });
 
-        // Sync to Neo4j graph
-        await addProductToGraph(name, category, similarTo || []);
+        // Sync to Neo4j graph (non-fatal: product is safely in MongoDB even if graph is unreachable)
+        try {
+            await addProductToGraph(name, category, similarTo || []);
+        } catch (graphError) {
+            console.warn('Neo4j graph sync failed (non-fatal, product saved to DB):', graphError);
+        }
 
         res.status(201).json({
             message: 'Product added successfully',
             product,
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error adding product:', error);
-        res.status(500).json({ message: 'Failed to add product' });
+        res.status(500).json({ message: error.message || 'Failed to add product' });
     }
 };
 
@@ -130,8 +140,12 @@ export const deleteProduct = async (req: Request, res: Response): Promise<void> 
             return;
         }
 
-        // Remove from Neo4j graph
-        await removeProductFromGraph(product.name);
+        // Remove from Neo4j graph (non-fatal if offline)
+        try {
+            await removeProductFromGraph(product.name);
+        } catch (graphError) {
+            console.warn('Neo4j removal failed (non-fatal):', graphError);
+        }
 
         // Remove from MongoDB
         await Product.findByIdAndDelete(product._id);
