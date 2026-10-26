@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import { ChatHistory, IMessage } from '../models/chatHistory.model';
+import { Product } from '../models/product.model';
 import { hybridSearchService } from '../services/hybridSearchService';
 
 const getGenAI = () => new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'your_api_key_here');
@@ -36,6 +37,10 @@ export const handleRecipeChat = async (req: Request, res: Response): Promise<voi
     }
 
     try {
+        // Query the live local catalog to ground Gemini in available store inventory
+        const availableProducts = await Product.find({ stock: { $gt: 0 } }).select('name category price');
+        const catalogList = availableProducts.map(p => `- "${p.name}" (${p.category}, ₹${p.price})`).join('\n');
+
         const genAI = getGenAI();
         const modelName = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
         const model = genAI.getGenerativeModel({
@@ -47,20 +52,20 @@ export const handleRecipeChat = async (req: Request, res: Response): Promise<voi
                     properties: {
                         reply: {
                             type: SchemaType.STRING,
-                            description: "Conversational summary of what recipe or items you're preparing and helpful cooking advice."
+                            description: "Helpful, conversational explanation of your advice, recipe, or product recommendations."
                         },
                         cookingProcess: {
                             type: SchemaType.STRING,
-                            description: "Step-by-step cooking steps in concise markdown bullet points. Leave empty string if casual greeting."
+                            description: "If cooking/recipe is requested, numbered markdown steps. Otherwise empty string."
                         },
                         ingredientsToSearch: {
                             type: SchemaType.ARRAY,
-                            description: "Generic individual ingredients needed for this dish.",
+                            description: "Recommended purchasable products matching the user's intent. Must use names from the store catalog whenever applicable.",
                             items: {
                                 type: SchemaType.OBJECT,
                                 properties: {
-                                    name: { type: SchemaType.STRING, description: "Common generic name e.g. 'pasta', 'milk', 'eggs', 'tomato sauce'" },
-                                    quantity: { type: SchemaType.NUMBER, description: "Quantity required" },
+                                    name: { type: SchemaType.STRING, description: "Catalog product name or specific search term, e.g. 'fresh pasta', 'paracetamol', 'amul doodh'" },
+                                    quantity: { type: SchemaType.NUMBER, description: "Quantity needed" },
                                     unit: { type: SchemaType.STRING, description: "Unit e.g. 'pack', 'liter', 'pieces', 'g', 'can'" }
                                 },
                                 required: ["name", "quantity", "unit"]
@@ -70,7 +75,24 @@ export const handleRecipeChat = async (req: Request, res: Response): Promise<voi
                     required: ["reply", "cookingProcess", "ingredientsToSearch"]
                 }
             },
-            systemInstruction: "You are the Amazon-Grade Smart Market AI Recipe & Kitchen Chef. You help users prepare meals, craft recipes, and immediately assemble fresh grocery cart bundles from local neighborhood sellers. Always output valid JSON conforming strictly to the schema. Keep recipe steps concise and practical.",
+            systemInstruction: `You are the Vicinity Smart Marketplace AI Shopping & Recipe Concierge.
+You help neighborhood buyers find exact products, get recipe suggestions with ingredients in stock, and find solutions for everyday health/grocery needs.
+
+CURRENT LOCAL STORE INVENTORY (IN STOCK):
+${catalogList}
+
+GROUNDING & RELEVANCE RULES:
+1. STRICT CATALOG GROUNDING: When recommending items, ALWAYS prioritize products that exist in the store inventory above. Never recommend arbitrary brand names or exotic items not sold here.
+2. RECIPES & COOKING: When the user asks for a recipe or meal idea:
+   - Provide a concise, clear step-by-step numbered cooking guide in 'cookingProcess'.
+   - In 'ingredientsToSearch', ONLY list purchasable grocery items in the catalog (e.g. 'fresh pasta', 'tomato sauce', 'mozzarella cheese', 'extra virgin olive oil', 'amul doodh', 'farm fresh eggs', 'whole wheat bread', 'amul butter', 'ginger tea', 'pure raw honey').
+   - DO NOT add non-purchasable household staples like tap water, salt, or generic pepper into 'ingredientsToSearch'.
+3. HEALTH & SYMPTOMS: When the user asks for health/relief recommendations (e.g. fever, headache, cold, cough, sore throat, fatigue, eye strain):
+   - Provide friendly, safe advice in 'reply'.
+   - Add the relevant catalog OTC item into 'ingredientsToSearch' (e.g. 'paracetamol' for fever/headache, 'vicks vaporub' or 'cough drops' for cold/cough, 'electrolyte powder' for dehydration, 'pain relief balm' for headache/body pain, 'lubricant eye drops' for eye strain).
+4. PERSONAL CARE & GENERAL: For shampoo, body wash, reading glasses, dairy, breakfast, recommend available products ('shampoo', 'herbal body wash', 'spects', 'amul doodh', 'amul butter').
+5. CASUAL CHAT: If user just greets or asks general questions without product intent, reply politely and leave 'ingredientsToSearch' and 'cookingProcess' empty.
+6. Output valid JSON strictly following the schema.`,
         });
 
         // Fetch or create chat history
@@ -123,7 +145,7 @@ export const handleRecipeChat = async (req: Request, res: Response): Promise<voi
             return;
         }
 
-        // Amazon-Grade Ingredient Search via HybridSearchService
+        // Strict Amazon-Grade Ingredient Search via HybridSearchService
         const matchedProducts: ProductResult[] = [];
         const missingIngredients: string[] = [];
         const matchedProductIds = new Set<string>();
@@ -131,13 +153,14 @@ export const handleRecipeChat = async (req: Request, res: Response): Promise<voi
         for (const item of ingredients) {
             const searchResult = await hybridSearchService.search(item.name, buyerLat, buyerLng);
 
-            // Filter out items that are already matched to a previous ingredient if another option exists
-            let chosen = searchResult.results.find(r => !matchedProductIds.has(r.id));
-            if (!chosen && searchResult.results.length > 0) {
+            // Filter out items already matched; require high-confidence score (>= 65)
+            let chosen = searchResult.results.find(r => !matchedProductIds.has(r.id) && r.score >= 65);
+            if (!chosen && searchResult.results.length > 0 && searchResult.results[0].score >= 65) {
                 chosen = searchResult.results[0];
             }
 
-            if (chosen) {
+            // Verify strict relevance: must have score >= 65 and not an out-of-catalog hit
+            if (chosen && chosen.score >= 65 && !searchResult.isOutOfCatalog) {
                 matchedProductIds.add(chosen.id);
                 matchedProducts.push({
                     productId: chosen.id,

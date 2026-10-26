@@ -217,6 +217,14 @@ export class HybridSearchService {
         }
 
         const targetProductTerms = new Set<string>();
+// ── Stop Words Set to prevent false-positive semantic matches ──
+const STOP_WORDS = new Set([
+    'a', 'an', 'the', 'and', 'or', 'for', 'in', 'on', 'at', 'to', 'from', 'by',
+    'with', 'without', 'of', 'is', 'are', 'was', 'were', 'it', 'its', 'can',
+    'you', 'me', 'my', 'i', 'we', 'want', 'need', 'some', 'something', 'give',
+    'please', 'how', 'what', 'where', 'make', 'do', 'any', 'get', 'item', 'items'
+]);
+
         let intentLabel = `Results for "${trimmed}"`;
 
         // Exact & Corrected term
@@ -232,14 +240,12 @@ export class HybridSearchService {
             intentLabel = `Recognized vernacular term: "${correctedQuery}"`;
         }
 
-        // Concept / Symptom / Recipe expansion
+        // Concept / Symptom / Recipe expansion (strict concept phrase match or query containing full concept)
         for (const [conceptKey, items] of Object.entries(CONCEPT_EXPANSIONS)) {
-            if (
-                normalizedQuery === conceptKey ||
-                correctedQuery === conceptKey ||
-                normalizedQuery.includes(conceptKey) ||
-                conceptKey.includes(normalizedQuery)
-            ) {
+            const isExactConcept = normalizedQuery === conceptKey || correctedQuery === conceptKey;
+            const queryContainsConcept = normalizedQuery.includes(conceptKey) || correctedQuery.includes(conceptKey);
+
+            if (isExactConcept || queryContainsConcept) {
                 items.forEach(item => targetProductTerms.add(item));
                 intentLabel = `Curated solution for: ${conceptKey.toUpperCase()}`;
             }
@@ -249,7 +255,6 @@ export class HybridSearchService {
         const allProducts = await Product.find({ stock: { $gt: 0 } }).populate('shop', 'name address location isOpen rating ratingCount');
 
         const candidates: SearchResultItem[] = [];
-        const seenProductIds = new Set<string>();
 
         for (const p of allProducts) {
             const shop = p.shop as any;
@@ -266,14 +271,20 @@ export class HybridSearchService {
 
             // Check against expanded target terms
             for (const target of targetProductTerms) {
+                if (!target || STOP_WORDS.has(target)) continue;
+
                 // A. Exact name match
                 if (pName === target) {
                     score = Math.max(score, 120);
                     matchType = 'exact';
                 }
-                // B. Name substring / containment
-                else if (pName.includes(target) || target.includes(pName)) {
+                // B. Name substring / containment (ensure target is not a single short word)
+                else if (target.length >= 3 && pName.includes(target)) {
                     score = Math.max(score, 90);
+                    matchType = 'exact';
+                }
+                else if (pName.length >= 4 && target.includes(pName)) {
+                    score = Math.max(score, 85);
                     matchType = 'exact';
                 }
                 // C. Keywords exact / containment
@@ -281,20 +292,24 @@ export class HybridSearchService {
                     score = Math.max(score, 75);
                     matchType = 'synonym';
                 }
+                else if (target.length >= 4 && (pKeywords.some(k => k === target || k.includes(target)) || pSimilarTo.some(s => s === target || s.includes(target)))) {
+                    score = Math.max(score, 70);
+                    matchType = 'synonym';
+                }
                 // D. Category match
-                else if (pCategory.includes(target) || target.includes(pCategory)) {
+                else if (pCategory === target || (target.length >= 4 && pCategory.includes(target))) {
                     score = Math.max(score, 65);
                     matchType = 'category';
                 }
-                // E. Description match
-                else if (pDesc.includes(target)) {
+                // E. Description match (only for specific non-stopword terms of length >= 4)
+                else if (target.length >= 4 && !STOP_WORDS.has(target) && pDesc.includes(target)) {
                     score = Math.max(score, 45);
                     matchType = 'semantic';
                 }
             }
 
-            // Word-level token matching & Fuzzy Levenshtein
-            const queryTokens = correctedQuery.split(/\s+/).filter(t => t.length > 2);
+            // Word-level token matching & Fuzzy Levenshtein (ignore stopwords)
+            const queryTokens = correctedQuery.split(/\s+/).filter(t => t.length > 2 && !STOP_WORDS.has(t));
             for (const token of queryTokens) {
                 if (pName.includes(token)) {
                     score += 30;
@@ -304,14 +319,14 @@ export class HybridSearchService {
                 }
 
                 // Check typo tolerance with Levenshtein (edit distance <= 2 for words >= 5 chars)
-                const nameWords = pName.split(/\s+/);
+                const nameWords = pName.split(/\s+/).filter(w => !STOP_WORDS.has(w));
                 for (const nw of nameWords) {
-                    if (nw.length >= 4 && token.length >= 4) {
+                    if (nw[0] === token[0] && nw.length >= 5 && token.length >= 5) {
                         const dist = levenshteinDistance(token, nw);
                         if (dist === 1) {
                             score = Math.max(score, 70);
                             matchType = 'fuzzy';
-                        } else if (dist === 2 && token.length >= 6) {
+                        } else if (dist === 2 && token.length >= 7 && nw.length >= 7) {
                             score = Math.max(score, 50);
                             matchType = 'fuzzy';
                         }
@@ -319,8 +334,9 @@ export class HybridSearchService {
                 }
             }
 
-            // If minimum relevance threshold passed
-            if (score >= 40) {
+            // If minimum relevance threshold passed (ignore weak semantic-only description hits)
+            const minScoreThreshold = matchType === 'semantic' ? 65 : 50;
+            if (score >= minScoreThreshold) {
                 // Proximity distance calculation
                 let distance: number | undefined;
                 if (
