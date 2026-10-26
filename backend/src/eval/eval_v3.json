@@ -1,0 +1,739 @@
+{
+  "timestamp": "2026-10-26T04:53:53.878Z",
+  "version": "amazon-production-v3",
+  "summary": {
+    "bucket": "OVERALL",
+    "queryCount": 44,
+    "avgRecall10": 1,
+    "avgMrr": 1,
+    "avgNdcg10": 0.9368,
+    "zeroResultRate": 0.0909,
+    "avgLatencyMs": 157
+  },
+  "bucketSummaries": [
+    {
+      "bucket": "exact",
+      "queryCount": 10,
+      "avgRecall10": 1,
+      "avgMrr": 1,
+      "avgNdcg10": 0.9613,
+      "zeroResultRate": 0,
+      "avgLatencyMs": 216
+    },
+    {
+      "bucket": "typo",
+      "queryCount": 8,
+      "avgRecall10": 1,
+      "avgMrr": 1,
+      "avgNdcg10": 0.9516,
+      "zeroResultRate": 0,
+      "avgLatencyMs": 158
+    },
+    {
+      "bucket": "hinglish",
+      "queryCount": 8,
+      "avgRecall10": 1,
+      "avgMrr": 1,
+      "avgNdcg10": 0.9707,
+      "zeroResultRate": 0,
+      "avgLatencyMs": 158
+    },
+    {
+      "bucket": "symptom",
+      "queryCount": 6,
+      "avgRecall10": 1,
+      "avgMrr": 1,
+      "avgNdcg10": 0.7826,
+      "zeroResultRate": 0,
+      "avgLatencyMs": 160
+    },
+    {
+      "bucket": "dish",
+      "queryCount": 4,
+      "avgRecall10": 1,
+      "avgMrr": 1,
+      "avgNdcg10": 0.9414,
+      "zeroResultRate": 0,
+      "avgLatencyMs": 159
+    },
+    {
+      "bucket": "vague",
+      "queryCount": 4,
+      "avgRecall10": 1,
+      "avgMrr": 1,
+      "avgNdcg10": 0.9414,
+      "zeroResultRate": 0,
+      "avgLatencyMs": 159
+    },
+    {
+      "bucket": "out_of_catalog",
+      "queryCount": 4,
+      "avgRecall10": 1,
+      "avgMrr": 1,
+      "avgNdcg10": 1,
+      "zeroResultRate": 1,
+      "avgLatencyMs": 0
+    }
+  ],
+  "queryDetails": [
+    {
+      "id": "q-exact-01",
+      "query": "amul doodh",
+      "bucket": "exact",
+      "latencyMs": 736,
+      "resultCount": 2,
+      "returnedNames": [
+        "amul doodh",
+        "amul butter"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-exact-02",
+      "query": "shampoo",
+      "bucket": "exact",
+      "latencyMs": 161,
+      "resultCount": 1,
+      "returnedNames": [
+        "shampoo"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-exact-03",
+      "query": "spects",
+      "bucket": "exact",
+      "latencyMs": 160,
+      "resultCount": 2,
+      "returnedNames": [
+        "spects",
+        "lubricant eye drops"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-exact-04",
+      "query": "paracetamol",
+      "bucket": "exact",
+      "latencyMs": 158,
+      "resultCount": 1,
+      "returnedNames": [
+        "paracetamol"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-exact-05",
+      "query": "vicks vaporub",
+      "bucket": "exact",
+      "latencyMs": 159,
+      "resultCount": 1,
+      "returnedNames": [
+        "vicks vaporub"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 0.6131,
+      "zeroResult": false
+    },
+    {
+      "id": "q-exact-06",
+      "query": "fresh pasta",
+      "bucket": "exact",
+      "latencyMs": 159,
+      "resultCount": 3,
+      "returnedNames": [
+        "fresh pasta",
+        "tomato sauce",
+        "farm fresh eggs"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-exact-07",
+      "query": "tomato sauce",
+      "bucket": "exact",
+      "latencyMs": 158,
+      "resultCount": 1,
+      "returnedNames": [
+        "tomato sauce"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-exact-08",
+      "query": "ginger tea",
+      "bucket": "exact",
+      "latencyMs": 156,
+      "resultCount": 2,
+      "returnedNames": [
+        "ginger tea",
+        "pure raw honey"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-exact-09",
+      "query": "cough drops",
+      "bucket": "exact",
+      "latencyMs": 158,
+      "resultCount": 3,
+      "returnedNames": [
+        "cough drops",
+        "vicks vaporub",
+        "lubricant eye drops"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-exact-10",
+      "query": "honey",
+      "bucket": "exact",
+      "latencyMs": 158,
+      "resultCount": 3,
+      "returnedNames": [
+        "pure raw honey",
+        "ginger tea",
+        "cough drops"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-typo-01",
+      "query": "paracetmol",
+      "bucket": "typo",
+      "latencyMs": 157,
+      "resultCount": 1,
+      "returnedNames": [
+        "paracetamol"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-typo-02",
+      "query": "shamppo",
+      "bucket": "typo",
+      "latencyMs": 159,
+      "resultCount": 1,
+      "returnedNames": [
+        "shampoo"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-typo-03",
+      "query": "specks",
+      "bucket": "typo",
+      "latencyMs": 157,
+      "resultCount": 2,
+      "returnedNames": [
+        "spects",
+        "lubricant eye drops"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-typo-04",
+      "query": "amul dudh",
+      "bucket": "typo",
+      "latencyMs": 158,
+      "resultCount": 2,
+      "returnedNames": [
+        "amul doodh",
+        "amul butter"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-typo-05",
+      "query": "vicjs vaporub",
+      "bucket": "typo",
+      "latencyMs": 158,
+      "resultCount": 1,
+      "returnedNames": [
+        "vicks vaporub"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 0.6131,
+      "zeroResult": false
+    },
+    {
+      "id": "q-typo-06",
+      "query": "gingr tea",
+      "bucket": "typo",
+      "latencyMs": 158,
+      "resultCount": 2,
+      "returnedNames": [
+        "ginger tea",
+        "pure raw honey"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-typo-07",
+      "query": "tomto sause",
+      "bucket": "typo",
+      "latencyMs": 158,
+      "resultCount": 1,
+      "returnedNames": [
+        "tomato sauce"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-typo-08",
+      "query": "pazta",
+      "bucket": "typo",
+      "latencyMs": 157,
+      "resultCount": 2,
+      "returnedNames": [
+        "fresh pasta",
+        "farm fresh eggs"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-hinglish-01",
+      "query": "doodh",
+      "bucket": "hinglish",
+      "latencyMs": 156,
+      "resultCount": 6,
+      "returnedNames": [
+        "amul doodh",
+        "amul butter",
+        "greek yogurt",
+        "mozzarella cheese",
+        "farm fresh eggs",
+        "whole wheat bread"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-hinglish-02",
+      "query": "chai patti",
+      "bucket": "hinglish",
+      "latencyMs": 158,
+      "resultCount": 3,
+      "returnedNames": [
+        "ginger tea",
+        "pure raw honey",
+        "shampoo"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-hinglish-03",
+      "query": "bukhar ki dawai",
+      "bucket": "hinglish",
+      "latencyMs": 158,
+      "resultCount": 1,
+      "returnedNames": [
+        "paracetamol"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-hinglish-04",
+      "query": "chasma",
+      "bucket": "hinglish",
+      "latencyMs": 158,
+      "resultCount": 2,
+      "returnedNames": [
+        "spects",
+        "lubricant eye drops"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-hinglish-05",
+      "query": "gale me dard",
+      "bucket": "hinglish",
+      "latencyMs": 157,
+      "resultCount": 2,
+      "returnedNames": [
+        "cough drops",
+        "pure raw honey"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 0.7654,
+      "zeroResult": false
+    },
+    {
+      "id": "q-hinglish-06",
+      "query": "sard dard",
+      "bucket": "hinglish",
+      "latencyMs": 157,
+      "resultCount": 2,
+      "returnedNames": [
+        "paracetamol",
+        "pain relief balm"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-hinglish-07",
+      "query": "baal dhone ka",
+      "bucket": "hinglish",
+      "latencyMs": 158,
+      "resultCount": 1,
+      "returnedNames": [
+        "shampoo"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-hinglish-08",
+      "query": "mitha madhu",
+      "bucket": "hinglish",
+      "latencyMs": 158,
+      "resultCount": 3,
+      "returnedNames": [
+        "pure raw honey",
+        "ginger tea",
+        "cough drops"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-symptom-01",
+      "query": "sore throat and fever",
+      "bucket": "symptom",
+      "latencyMs": 169,
+      "resultCount": 3,
+      "returnedNames": [
+        "cough drops",
+        "pure raw honey",
+        "paracetamol"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 0.7039,
+      "zeroResult": false
+    },
+    {
+      "id": "q-symptom-02",
+      "query": "headache",
+      "bucket": "symptom",
+      "latencyMs": 157,
+      "resultCount": 2,
+      "returnedNames": [
+        "paracetamol",
+        "pain relief balm"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-symptom-03",
+      "query": "cold and cough relief",
+      "bucket": "symptom",
+      "latencyMs": 158,
+      "resultCount": 4,
+      "returnedNames": [
+        "cough drops",
+        "vicks vaporub",
+        "ginger tea",
+        "pure raw honey"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-symptom-04",
+      "query": "eye strain",
+      "bucket": "symptom",
+      "latencyMs": 158,
+      "resultCount": 2,
+      "returnedNames": [
+        "lubricant eye drops",
+        "spects"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 0.7654,
+      "zeroResult": false
+    },
+    {
+      "id": "q-symptom-05",
+      "query": "feeling weak and dehydrated",
+      "bucket": "symptom",
+      "latencyMs": 158,
+      "resultCount": 1,
+      "returnedNames": [
+        "electrolyte powder"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 0.6131,
+      "zeroResult": false
+    },
+    {
+      "id": "q-symptom-06",
+      "query": "stuffy runny nose",
+      "bucket": "symptom",
+      "latencyMs": 158,
+      "resultCount": 1,
+      "returnedNames": [
+        "vicks vaporub"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 0.6131,
+      "zeroResult": false
+    },
+    {
+      "id": "q-dish-01",
+      "query": "lasagna",
+      "bucket": "dish",
+      "latencyMs": 162,
+      "resultCount": 3,
+      "returnedNames": [
+        "fresh pasta",
+        "mozzarella cheese",
+        "tomato sauce"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-dish-02",
+      "query": "hot milk tea",
+      "bucket": "dish",
+      "latencyMs": 158,
+      "resultCount": 3,
+      "returnedNames": [
+        "ginger tea",
+        "amul doodh",
+        "pure raw honey"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-dish-03",
+      "query": "pasta dinner tonight",
+      "bucket": "dish",
+      "latencyMs": 157,
+      "resultCount": 5,
+      "returnedNames": [
+        "fresh pasta",
+        "tomato sauce",
+        "mozzarella cheese",
+        "extra virgin olive oil",
+        "ginger tea"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-dish-04",
+      "query": "warm ginger honey water",
+      "bucket": "dish",
+      "latencyMs": 157,
+      "resultCount": 3,
+      "returnedNames": [
+        "ginger tea",
+        "pure raw honey",
+        "farm fresh eggs"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 0.7654,
+      "zeroResult": false
+    },
+    {
+      "id": "q-vague-01",
+      "query": "something for breakfast",
+      "bucket": "vague",
+      "latencyMs": 157,
+      "resultCount": 5,
+      "returnedNames": [
+        "amul butter",
+        "farm fresh eggs",
+        "whole wheat bread",
+        "greek yogurt",
+        "amul doodh"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-vague-02",
+      "query": "dairy items",
+      "bucket": "vague",
+      "latencyMs": 158,
+      "resultCount": 4,
+      "returnedNames": [
+        "amul doodh",
+        "amul butter",
+        "greek yogurt",
+        "mozzarella cheese"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-vague-03",
+      "query": "hair wash products",
+      "bucket": "vague",
+      "latencyMs": 161,
+      "resultCount": 2,
+      "returnedNames": [
+        "shampoo",
+        "herbal body wash"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-vague-04",
+      "query": "reading essentials",
+      "bucket": "vague",
+      "latencyMs": 158,
+      "resultCount": 2,
+      "returnedNames": [
+        "spects",
+        "lubricant eye drops"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 0.7654,
+      "zeroResult": false
+    },
+    {
+      "id": "q-ooc-01",
+      "query": "iphone 15 pro max case",
+      "bucket": "out_of_catalog",
+      "latencyMs": 0,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": true
+    },
+    {
+      "id": "q-ooc-02",
+      "query": "car engine oil 5w30",
+      "bucket": "out_of_catalog",
+      "latencyMs": 0,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": true
+    },
+    {
+      "id": "q-ooc-03",
+      "query": "playstation 5 controller",
+      "bucket": "out_of_catalog",
+      "latencyMs": 0,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": true
+    },
+    {
+      "id": "q-ooc-04",
+      "query": "airplane ticket to london",
+      "bucket": "out_of_catalog",
+      "latencyMs": 0,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": true
+    }
+  ]
+}

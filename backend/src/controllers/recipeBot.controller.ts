@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
-import { Product } from '../models/product.model';
 import { ChatHistory, IMessage } from '../models/chatHistory.model';
+import { hybridSearchService } from '../services/hybridSearchService';
 
 const getGenAI = () => new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'your_api_key_here');
 
@@ -20,15 +20,15 @@ interface ProductResult {
     distance?: number;
     amountNeeded: number;
     unitNeeded: string;
+    matchScore?: number;
+    matchReasons?: string[];
 }
 
 export const handleRecipeChat = async (req: Request, res: Response): Promise<void> => {
-    // We now extract the history from the DB instead of req.body to prevent tampering,
-    // but the frontend can still send a local history if unauthenticated (not possible yet since requireAuth is active).
     const { message, lat, lng } = req.body;
     const userId = req.user._id;
-    const buyerLat = lat ? Number(lat) : null;
-    const buyerLng = lng ? Number(lng) : null;
+    const buyerLat = lat ? Number(lat) : undefined;
+    const buyerLng = lng ? Number(lng) : undefined;
 
     if (!message || !message.trim()) {
         res.status(400).json({ reply: 'Please provide a message.', products: [] });
@@ -40,7 +40,6 @@ export const handleRecipeChat = async (req: Request, res: Response): Promise<voi
         const modelName = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
         const model = genAI.getGenerativeModel({
             model: modelName,
-            // Use structured output capabilities
             generationConfig: {
                 responseMimeType: "application/json",
                 responseSchema: {
@@ -48,21 +47,21 @@ export const handleRecipeChat = async (req: Request, res: Response): Promise<voi
                     properties: {
                         reply: {
                             type: SchemaType.STRING,
-                            description: "Your conversational response to the user. E.g. 'Sure, I can help you with that!' or 'Here are the ingredients for pizza.'"
+                            description: "Conversational summary of what recipe or items you're preparing and helpful cooking advice."
                         },
                         cookingProcess: {
                             type: SchemaType.STRING,
-                            description: "If the user asks for a recipe, provide a SHORT, clear, numbered list of the step-by-step cooking process here using markdown. Keep it very concise. Provide an empty string if not applicable."
+                            description: "Step-by-step cooking steps in concise markdown bullet points. Leave empty string if casual greeting."
                         },
                         ingredientsToSearch: {
                             type: SchemaType.ARRAY,
-                            description: "If the user is asking for a recipe or specific items, list the generic core ingredients here. Leave empty if just chatting.",
+                            description: "Generic individual ingredients needed for this dish.",
                             items: {
                                 type: SchemaType.OBJECT,
                                 properties: {
-                                    name: { type: SchemaType.STRING },
-                                    quantity: { type: SchemaType.NUMBER },
-                                    unit: { type: SchemaType.STRING }
+                                    name: { type: SchemaType.STRING, description: "Common generic name e.g. 'pasta', 'milk', 'eggs', 'tomato sauce'" },
+                                    quantity: { type: SchemaType.NUMBER, description: "Quantity required" },
+                                    unit: { type: SchemaType.STRING, description: "Unit e.g. 'pack', 'liter', 'pieces', 'g', 'can'" }
                                 },
                                 required: ["name", "quantity", "unit"]
                             }
@@ -71,7 +70,7 @@ export const handleRecipeChat = async (req: Request, res: Response): Promise<voi
                     required: ["reply", "cookingProcess", "ingredientsToSearch"]
                 }
             },
-            systemInstruction: "You are the Smart Market AI Shopping Assistant. You help users find exactly what they need, suggest recipes, and act friendly. Always formulate a conversational `reply`. If the user asks for a recipe, output the exact step-by-step cooking process in `cookingProcess` formatted minimally and beautifully with markdown lists. Keep your recipes extremely short and readable. Do not write large blocks of unstructured text. Populate `ingredientsToSearch` with generic names. If they are just chatting generally, leave `ingredientsToSearch` and `cookingProcess` empty and just reply.",
+            systemInstruction: "You are the Amazon-Grade Smart Market AI Recipe & Kitchen Chef. You help users prepare meals, craft recipes, and immediately assemble fresh grocery cart bundles from local neighborhood sellers. Always output valid JSON conforming strictly to the schema. Keep recipe steps concise and practical.",
         });
 
         // Fetch or create chat history
@@ -80,23 +79,16 @@ export const handleRecipeChat = async (req: Request, res: Response): Promise<voi
             chatHistory = new ChatHistory({ user: userId, messages: [] });
         }
 
-        // Format history for Gemini
-        // Gemini expects { role: 'user'|'model', parts: [{ text: string }] }
-        // and strictly requires that the history starts with a 'user' message
-        // and alternates user, model, user, model.
         let rawHistory = chatHistory.messages.map(m => ({ role: m.role, text: m.text }));
 
-        // Remove any leading bot messages
         while (rawHistory.length > 0 && rawHistory[0].role === 'bot') {
             rawHistory.shift();
         }
 
-        // Collapse consecutive messages of the same role
         const collapsedHistory: any[] = [];
         for (const msg of rawHistory) {
             const role = msg.role === 'bot' ? 'model' : 'user';
             if (collapsedHistory.length > 0 && collapsedHistory[collapsedHistory.length - 1].role === role) {
-                // Same role as previous, append text
                 collapsedHistory[collapsedHistory.length - 1].parts[0].text += `\n\n${msg.text}`;
             } else {
                 collapsedHistory.push({
@@ -123,73 +115,41 @@ export const handleRecipeChat = async (req: Request, res: Response): Promise<voi
         }
 
         const replyMessage = parsedResponse.reply || "I'm not sure what to say.";
-        const ingredients = parsedResponse.ingredientsToSearch || [];
+        const ingredients: ExtractedIngredient[] = parsedResponse.ingredientsToSearch || [];
 
-        // If no ingredients needed, just return the conversation
+        // If no ingredients needed, return the conversational reply
         if (ingredients.length === 0) {
             res.status(200).json({ reply: replyMessage, products: [] });
             return;
         }
 
-        // Search for these ingredients in our database
+        // Amazon-Grade Ingredient Search via HybridSearchService
         const matchedProducts: ProductResult[] = [];
         const missingIngredients: string[] = [];
+        const matchedProductIds = new Set<string>();
 
-        for (const item of (ingredients as ExtractedIngredient[])) {
-            // Find products matching the ingredient name or keywords/category
-            const escapedName = item.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const nameRegex = new RegExp(escapedName, 'i');
-            const tokens = item.name.split(/\s+/).filter(t => t.length > 2);
+        for (const item of ingredients) {
+            const searchResult = await hybridSearchService.search(item.name, buyerLat, buyerLng);
 
-            const orConditions: any[] = [
-                { name: nameRegex },
-                { category: nameRegex },
-                { keywords: nameRegex },
-                { similarTo: nameRegex },
-            ];
-
-            tokens.forEach(tok => {
-                const tokRegex = new RegExp(tok.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-                orConditions.push({ name: tokRegex });
-                orConditions.push({ category: tokRegex });
-                orConditions.push({ keywords: tokRegex });
-                orConditions.push({ similarTo: tokRegex });
-            });
-
-            const products = await Product.find({
-                $or: orConditions,
-                stock: { $gt: 0 }
-            }).populate('shop', 'name address location isOpen');
-
-            let bestMatch: any = null;
-            let minDistance = Infinity;
-
-            for (const p of products) {
-                const shop = p.shop as any;
-                if (!shop || shop.isOpen === false) continue;
-
-                let dist = Infinity;
-                if (buyerLat != null && buyerLng != null && shop.location?.coordinates) {
-                    const [shopLng, shopLat] = shop.location.coordinates;
-                    dist = haversineKm(buyerLat, buyerLng, shopLat, shopLng);
-                }
-
-                if (dist < minDistance || !bestMatch) {
-                    minDistance = dist;
-                    bestMatch = { product: p, distance: dist !== Infinity ? dist : undefined };
-                }
+            // Filter out items that are already matched to a previous ingredient if another option exists
+            let chosen = searchResult.results.find(r => !matchedProductIds.has(r.id));
+            if (!chosen && searchResult.results.length > 0) {
+                chosen = searchResult.results[0];
             }
 
-            if (bestMatch) {
+            if (chosen) {
+                matchedProductIds.add(chosen.id);
                 matchedProducts.push({
-                    productId: bestMatch.product._id.toString(),
-                    name: bestMatch.product.name,
-                    price: bestMatch.product.price,
-                    shopName: bestMatch.product.shop.name,
-                    shopId: bestMatch.product.shop._id.toString(),
-                    distance: bestMatch.distance,
+                    productId: chosen.id,
+                    name: chosen.name,
+                    price: chosen.price,
+                    shopName: chosen.shop?.name || chosen.shopName,
+                    shopId: chosen.shop?.id || chosen.shopId,
+                    distance: chosen.shop?.distanceKm ?? chosen.distance,
                     amountNeeded: item.quantity,
-                    unitNeeded: item.unit
+                    unitNeeded: item.unit,
+                    matchScore: chosen.score,
+                    matchReasons: chosen.matchReasons
                 });
             } else {
                 missingIngredients.push(item.name);
@@ -250,19 +210,3 @@ export const getChatHistory = async (req: Request, res: Response): Promise<void>
         res.status(500).json({ message: "Failed to load chat history." });
     }
 };
-
-/**
- * Haversine distance between two lat/lng points, in km.
- */
-function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
-    const R = 6371;
-    const dLat = toRad(lat2 - lat1);
-    const dLng = toRad(lng2 - lng1);
-    const a = Math.sin(dLat / 2) ** 2 +
-        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-function toRad(deg: number): number {
-    return deg * (Math.PI / 180);
-}

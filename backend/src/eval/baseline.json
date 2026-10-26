@@ -1,0 +1,624 @@
+{
+  "timestamp": "2026-10-26T04:11:06.188Z",
+  "version": "baseline-phase0",
+  "summary": {
+    "bucket": "OVERALL",
+    "queryCount": 44,
+    "avgRecall10": 0.2614,
+    "avgMrr": 0.2727,
+    "avgNdcg10": 0.2639,
+    "zeroResultRate": 0.8182,
+    "avgLatencyMs": 202
+  },
+  "bucketSummaries": [
+    {
+      "bucket": "exact",
+      "queryCount": 10,
+      "avgRecall10": 0.2,
+      "avgMrr": 0.2,
+      "avgNdcg10": 0.2,
+      "zeroResultRate": 0.8,
+      "avgLatencyMs": 594
+    },
+    {
+      "bucket": "typo",
+      "queryCount": 8,
+      "avgRecall10": 0.125,
+      "avgMrr": 0.125,
+      "avgNdcg10": 0.125,
+      "zeroResultRate": 0.875,
+      "avgLatencyMs": 82
+    },
+    {
+      "bucket": "hinglish",
+      "queryCount": 8,
+      "avgRecall10": 0.25,
+      "avgMrr": 0.25,
+      "avgNdcg10": 0.25,
+      "zeroResultRate": 0.75,
+      "avgLatencyMs": 92
+    },
+    {
+      "bucket": "symptom",
+      "queryCount": 6,
+      "avgRecall10": 0.1667,
+      "avgMrr": 0.1667,
+      "avgNdcg10": 0.1667,
+      "zeroResultRate": 0.8333,
+      "avgLatencyMs": 85
+    },
+    {
+      "bucket": "dish",
+      "queryCount": 4,
+      "avgRecall10": 0.125,
+      "avgMrr": 0.25,
+      "avgNdcg10": 0.1533,
+      "zeroResultRate": 0.75,
+      "avgLatencyMs": 92
+    },
+    {
+      "bucket": "vague",
+      "queryCount": 4,
+      "avgRecall10": 0.25,
+      "avgMrr": 0.25,
+      "avgNdcg10": 0.25,
+      "zeroResultRate": 0.75,
+      "avgLatencyMs": 92
+    },
+    {
+      "bucket": "out_of_catalog",
+      "queryCount": 4,
+      "avgRecall10": 1,
+      "avgMrr": 1,
+      "avgNdcg10": 1,
+      "zeroResultRate": 1,
+      "avgLatencyMs": 75
+    }
+  ],
+  "queryDetails": [
+    {
+      "id": "q-exact-01",
+      "query": "amul doodh",
+      "bucket": "exact",
+      "latencyMs": 5193,
+      "resultCount": 1,
+      "returnedNames": [
+        "amul doodh"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-exact-02",
+      "query": "shampoo",
+      "bucket": "exact",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-exact-03",
+      "query": "spects",
+      "bucket": "exact",
+      "latencyMs": 149,
+      "resultCount": 1,
+      "returnedNames": [
+        "spects"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-exact-04",
+      "query": "paracetamol",
+      "bucket": "exact",
+      "latencyMs": 74,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-exact-05",
+      "query": "vicks vaporub",
+      "bucket": "exact",
+      "latencyMs": 84,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-exact-06",
+      "query": "fresh pasta",
+      "bucket": "exact",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-exact-07",
+      "query": "tomato sauce",
+      "bucket": "exact",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-exact-08",
+      "query": "ginger tea",
+      "bucket": "exact",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-exact-09",
+      "query": "cough drops",
+      "bucket": "exact",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-exact-10",
+      "query": "honey",
+      "bucket": "exact",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-typo-01",
+      "query": "paracetmol",
+      "bucket": "typo",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-typo-02",
+      "query": "shamppo",
+      "bucket": "typo",
+      "latencyMs": 72,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-typo-03",
+      "query": "specks",
+      "bucket": "typo",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-typo-04",
+      "query": "amul dudh",
+      "bucket": "typo",
+      "latencyMs": 149,
+      "resultCount": 1,
+      "returnedNames": [
+        "amul doodh"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-typo-05",
+      "query": "vicjs vaporub",
+      "bucket": "typo",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-typo-06",
+      "query": "gingr tea",
+      "bucket": "typo",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-typo-07",
+      "query": "tomto sause",
+      "bucket": "typo",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-typo-08",
+      "query": "pazta",
+      "bucket": "typo",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-hinglish-01",
+      "query": "doodh",
+      "bucket": "hinglish",
+      "latencyMs": 148,
+      "resultCount": 1,
+      "returnedNames": [
+        "amul doodh"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-hinglish-02",
+      "query": "chai patti",
+      "bucket": "hinglish",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-hinglish-03",
+      "query": "bukhar ki dawai",
+      "bucket": "hinglish",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-hinglish-04",
+      "query": "chasma",
+      "bucket": "hinglish",
+      "latencyMs": 148,
+      "resultCount": 1,
+      "returnedNames": [
+        "spects"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-hinglish-05",
+      "query": "gale me dard",
+      "bucket": "hinglish",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-hinglish-06",
+      "query": "sard dard",
+      "bucket": "hinglish",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-hinglish-07",
+      "query": "baal dhone ka",
+      "bucket": "hinglish",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-hinglish-08",
+      "query": "mitha madhu",
+      "bucket": "hinglish",
+      "latencyMs": 74,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-symptom-01",
+      "query": "sore throat and fever",
+      "bucket": "symptom",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-symptom-02",
+      "query": "headache",
+      "bucket": "symptom",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-symptom-03",
+      "query": "cold and cough relief",
+      "bucket": "symptom",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-symptom-04",
+      "query": "eye strain",
+      "bucket": "symptom",
+      "latencyMs": 148,
+      "resultCount": 1,
+      "returnedNames": [
+        "spects"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-symptom-05",
+      "query": "feeling weak and dehydrated",
+      "bucket": "symptom",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-symptom-06",
+      "query": "stuffy runny nose",
+      "bucket": "symptom",
+      "latencyMs": 72,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-dish-01",
+      "query": "lasagna",
+      "bucket": "dish",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-dish-02",
+      "query": "hot milk tea",
+      "bucket": "dish",
+      "latencyMs": 148,
+      "resultCount": 1,
+      "returnedNames": [
+        "amul doodh"
+      ],
+      "recallAt10": 0.5,
+      "mrr": 1,
+      "ndcgAt10": 0.6131,
+      "zeroResult": false
+    },
+    {
+      "id": "q-dish-03",
+      "query": "pasta dinner tonight",
+      "bucket": "dish",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-dish-04",
+      "query": "warm ginger honey water",
+      "bucket": "dish",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-vague-01",
+      "query": "something for breakfast",
+      "bucket": "vague",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-vague-02",
+      "query": "dairy items",
+      "bucket": "vague",
+      "latencyMs": 147,
+      "resultCount": 1,
+      "returnedNames": [
+        "amul doodh"
+      ],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": false
+    },
+    {
+      "id": "q-vague-03",
+      "query": "hair wash products",
+      "bucket": "vague",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-vague-04",
+      "query": "reading essentials",
+      "bucket": "vague",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 0,
+      "mrr": 0,
+      "ndcgAt10": 0,
+      "zeroResult": true
+    },
+    {
+      "id": "q-ooc-01",
+      "query": "iphone 15 pro max case",
+      "bucket": "out_of_catalog",
+      "latencyMs": 77,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": true
+    },
+    {
+      "id": "q-ooc-02",
+      "query": "car engine oil 5w30",
+      "bucket": "out_of_catalog",
+      "latencyMs": 73,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": true
+    },
+    {
+      "id": "q-ooc-03",
+      "query": "playstation 5 controller",
+      "bucket": "out_of_catalog",
+      "latencyMs": 75,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": true
+    },
+    {
+      "id": "q-ooc-04",
+      "query": "airplane ticket to london",
+      "bucket": "out_of_catalog",
+      "latencyMs": 74,
+      "resultCount": 0,
+      "returnedNames": [],
+      "recallAt10": 1,
+      "mrr": 1,
+      "ndcgAt10": 1,
+      "zeroResult": true
+    }
+  ]
+}

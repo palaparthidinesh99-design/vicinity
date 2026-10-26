@@ -1,0 +1,266 @@
+[
+  {
+    "id": "q-exact-01",
+    "query": "amul doodh",
+    "bucket": "exact",
+    "expected": ["amul doodh", "milk"]
+  },
+  {
+    "id": "q-exact-02",
+    "query": "shampoo",
+    "bucket": "exact",
+    "expected": ["shampoo"]
+  },
+  {
+    "id": "q-exact-03",
+    "query": "spects",
+    "bucket": "exact",
+    "expected": ["spects", "glasses"]
+  },
+  {
+    "id": "q-exact-04",
+    "query": "paracetamol",
+    "bucket": "exact",
+    "expected": ["paracetamol"]
+  },
+  {
+    "id": "q-exact-05",
+    "query": "vicks vaporub",
+    "bucket": "exact",
+    "expected": ["vicks", "vaporub"]
+  },
+  {
+    "id": "q-exact-06",
+    "query": "fresh pasta",
+    "bucket": "exact",
+    "expected": ["pasta"]
+  },
+  {
+    "id": "q-exact-07",
+    "query": "tomato sauce",
+    "bucket": "exact",
+    "expected": ["tomato sauce"]
+  },
+  {
+    "id": "q-exact-08",
+    "query": "ginger tea",
+    "bucket": "exact",
+    "expected": ["ginger", "tea"]
+  },
+  {
+    "id": "q-exact-09",
+    "query": "cough drops",
+    "bucket": "exact",
+    "expected": ["cough drops"]
+  },
+  {
+    "id": "q-exact-10",
+    "query": "honey",
+    "bucket": "exact",
+    "expected": ["honey"]
+  },
+  {
+    "id": "q-typo-01",
+    "query": "paracetmol",
+    "bucket": "typo",
+    "expected": ["paracetamol"]
+  },
+  {
+    "id": "q-typo-02",
+    "query": "shamppo",
+    "bucket": "typo",
+    "expected": ["shampoo"]
+  },
+  {
+    "id": "q-typo-03",
+    "query": "specks",
+    "bucket": "typo",
+    "expected": ["spects", "glasses"]
+  },
+  {
+    "id": "q-typo-04",
+    "query": "amul dudh",
+    "bucket": "typo",
+    "expected": ["amul doodh", "milk"]
+  },
+  {
+    "id": "q-typo-05",
+    "query": "vicjs vaporub",
+    "bucket": "typo",
+    "expected": ["vicks", "vaporub"]
+  },
+  {
+    "id": "q-typo-06",
+    "query": "gingr tea",
+    "bucket": "typo",
+    "expected": ["ginger", "tea"]
+  },
+  {
+    "id": "q-typo-07",
+    "query": "tomto sause",
+    "bucket": "typo",
+    "expected": ["tomato sauce"]
+  },
+  {
+    "id": "q-typo-08",
+    "query": "pazta",
+    "bucket": "typo",
+    "expected": ["pasta"]
+  },
+  {
+    "id": "q-hinglish-01",
+    "query": "doodh",
+    "bucket": "hinglish",
+    "expected": ["amul doodh", "milk"]
+  },
+  {
+    "id": "q-hinglish-02",
+    "query": "chai patti",
+    "bucket": "hinglish",
+    "expected": ["tea", "ginger"]
+  },
+  {
+    "id": "q-hinglish-03",
+    "query": "bukhar ki dawai",
+    "bucket": "hinglish",
+    "expected": ["paracetamol"]
+  },
+  {
+    "id": "q-hinglish-04",
+    "query": "chasma",
+    "bucket": "hinglish",
+    "expected": ["spects", "glasses"]
+  },
+  {
+    "id": "q-hinglish-05",
+    "query": "gale me dard",
+    "bucket": "hinglish",
+    "expected": ["cough drops", "honey", "vicks"]
+  },
+  {
+    "id": "q-hinglish-06",
+    "query": "sard dard",
+    "bucket": "hinglish",
+    "expected": ["pain balm", "paracetamol"]
+  },
+  {
+    "id": "q-hinglish-07",
+    "query": "baal dhone ka",
+    "bucket": "hinglish",
+    "expected": ["shampoo"]
+  },
+  {
+    "id": "q-hinglish-08",
+    "query": "mitha madhu",
+    "bucket": "hinglish",
+    "expected": ["honey"]
+  },
+  {
+    "id": "q-symptom-01",
+    "query": "sore throat and fever",
+    "bucket": "symptom",
+    "expected": ["paracetamol", "cough drops", "vicks"]
+  },
+  {
+    "id": "q-symptom-02",
+    "query": "headache",
+    "bucket": "symptom",
+    "expected": ["paracetamol", "pain balm"]
+  },
+  {
+    "id": "q-symptom-03",
+    "query": "cold and cough relief",
+    "bucket": "symptom",
+    "expected": ["vicks", "cough drops"]
+  },
+  {
+    "id": "q-symptom-04",
+    "query": "eye strain",
+    "bucket": "symptom",
+    "expected": ["spects", "eye drops", "glasses"]
+  },
+  {
+    "id": "q-symptom-05",
+    "query": "feeling weak and dehydrated",
+    "bucket": "symptom",
+    "expected": ["electrolyte", "honey"]
+  },
+  {
+    "id": "q-symptom-06",
+    "query": "stuffy runny nose",
+    "bucket": "symptom",
+    "expected": ["vicks", "cough drops"]
+  },
+  {
+    "id": "q-dish-01",
+    "query": "lasagna",
+    "bucket": "dish",
+    "expected": ["pasta", "tomato sauce", "mozzarella"]
+  },
+  {
+    "id": "q-dish-02",
+    "query": "hot milk tea",
+    "bucket": "dish",
+    "expected": ["milk", "tea", "ginger"]
+  },
+  {
+    "id": "q-dish-03",
+    "query": "pasta dinner tonight",
+    "bucket": "dish",
+    "expected": ["pasta", "tomato sauce", "olive oil"]
+  },
+  {
+    "id": "q-dish-04",
+    "query": "warm ginger honey water",
+    "bucket": "dish",
+    "expected": ["ginger", "honey", "tea"]
+  },
+  {
+    "id": "q-vague-01",
+    "query": "something for breakfast",
+    "bucket": "vague",
+    "expected": ["eggs", "bread", "milk", "butter", "yogurt"]
+  },
+  {
+    "id": "q-vague-02",
+    "query": "dairy items",
+    "bucket": "vague",
+    "expected": ["milk", "butter", "yogurt", "cheese"]
+  },
+  {
+    "id": "q-vague-03",
+    "query": "hair wash products",
+    "bucket": "vague",
+    "expected": ["shampoo", "body wash"]
+  },
+  {
+    "id": "q-vague-04",
+    "query": "reading essentials",
+    "bucket": "vague",
+    "expected": ["spects", "glasses", "eye drops"]
+  },
+  {
+    "id": "q-ooc-01",
+    "query": "iphone 15 pro max case",
+    "bucket": "out_of_catalog",
+    "expected": []
+  },
+  {
+    "id": "q-ooc-02",
+    "query": "car engine oil 5w30",
+    "bucket": "out_of_catalog",
+    "expected": []
+  },
+  {
+    "id": "q-ooc-03",
+    "query": "playstation 5 controller",
+    "bucket": "out_of_catalog",
+    "expected": []
+  },
+  {
+    "id": "q-ooc-04",
+    "query": "airplane ticket to london",
+    "bucket": "out_of_catalog",
+    "expected": []
+  }
+]
