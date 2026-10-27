@@ -74,8 +74,8 @@ sequenceDiagram
     actor Buyer
     participant Engine as HybridSearchService
     participant OOC as Out-of-Catalog Filter
+    participant Semantic as SemanticIntentEngine (Ontology & Intent)
     participant Normalizer as Vernacular & Typo Engine
-    participant KG as Concept Knowledge Graph
     participant DB as MongoDB Atlas
     participant Ranker as A9 Multi-Signal Ranker
 
@@ -84,10 +84,10 @@ sequenceDiagram
     alt Query is Out of Catalog (e.g., iPhone, flights)
         OOC-->>Buyer: return { isOutOfCatalog: true, totalMatches: 0 } [0ms]
     else Query is Valid
+        Engine->>Semantic: analyzeIntent(query) -> IntentLabel, TargetProducts, TargetCategories
         Engine->>Normalizer: Normalize + Apply HINGLISH_MAP + TYPO_MAP
-        Engine->>KG: Check CONCEPT_EXPANSIONS (Symptom/Recipe intents)
         Engine->>DB: Fetch active catalog items (stock > 0, store open)
-        Engine->>Ranker: Calculate Score = TextMatch + Proximity + Rating
+        Engine->>Ranker: Calculate Score = TextMatch + IntentResonance + Proximity + Rating
         Ranker->>Ranker: Filter Stop-Words & Enforce Threshold (score >= 50)
         Ranker->>Ranker: Vendor Deduplication (best merchant per SKU)
         Ranker-->>Buyer: Top-ranked candidate products

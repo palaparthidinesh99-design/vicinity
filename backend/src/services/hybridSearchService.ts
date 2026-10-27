@@ -1,5 +1,6 @@
 import { Product } from '../models/product.model';
 import '../models/shop.model';
+import { semanticIntentEngine, OOC_PATTERNS } from './semanticIntentEngine';
 
 export interface SearchResultItem {
     productId: string;
@@ -33,15 +34,7 @@ export interface SearchResponse {
     latencyMs: number;
 }
 
-// ── Out of Catalog Domain Blocklist / Patterns ──
-const OOC_PATTERNS = [
-    /\b(iphone|ipad|macbook|samsung galaxy|pixel \d|android phone|phone case|airpods)\b/i,
-    /\b(car engine|engine oil|motor oil|brake pads|tire|car battery|5w30|10w40)\b/i,
-    /\b(playstation|ps5|xbox|nintendo|gaming console|controller|gpu|nvidia|rtx)\b/i,
-    /\b(airplane|flight ticket|hotel booking|train ticket|visa|passport)\b/i,
-    /\b(cryptocurrency|bitcoin|ethereum|forex)\b/i,
-    /\b(real estate|apartment for rent|villa for sale)\b/i,
-];
+
 
 // ── Hinglish & Vernacular Normalization Dictionary ──
 const HINGLISH_MAP: Record<string, string[]> = {
@@ -205,7 +198,21 @@ export class HybridSearchService {
             }
         }
 
-        // 2. Query Preprocessing & Expansions
+        // 2. Deep Semantic Intent Analysis (Understands symptoms, health, meals, remedies, vernacular)
+        const semanticAnalysis = await semanticIntentEngine.analyzeIntent(trimmed);
+        if (semanticAnalysis.isOutOfCatalog) {
+            return {
+                query: trimmed,
+                intent: semanticAnalysis.intentLabel,
+                isOutOfCatalog: true,
+                totalMatches: 0,
+                products: [],
+                results: [],
+                latencyMs: Date.now() - startTime,
+            };
+        }
+
+        // 3. Query Preprocessing & Expansions
         let correctedQuery = normalizedQuery;
         if (TYPO_MAP[normalizedQuery]) {
             correctedQuery = TYPO_MAP[normalizedQuery];
@@ -217,15 +224,20 @@ export class HybridSearchService {
         }
 
         const targetProductTerms = new Set<string>();
-// ── Stop Words Set to prevent false-positive semantic matches ──
-const STOP_WORDS = new Set([
-    'a', 'an', 'the', 'and', 'or', 'for', 'in', 'on', 'at', 'to', 'from', 'by',
-    'with', 'without', 'of', 'is', 'are', 'was', 'were', 'it', 'its', 'can',
-    'you', 'me', 'my', 'i', 'we', 'want', 'need', 'some', 'something', 'give',
-    'please', 'how', 'what', 'where', 'make', 'do', 'any', 'get', 'item', 'items'
-]);
+        let intentLabel = semanticAnalysis.matched ? semanticAnalysis.intentLabel : `Results for "${trimmed}"`;
 
-        let intentLabel = `Results for "${trimmed}"`;
+        // Add target products from deep semantic intent understanding
+        if (semanticAnalysis.matched && semanticAnalysis.targetProducts.length > 0) {
+            semanticAnalysis.targetProducts.forEach(term => targetProductTerms.add(term.toLowerCase()));
+        }
+
+        // ── Stop Words Set to prevent false-positive semantic matches ──
+        const STOP_WORDS = new Set([
+            'a', 'an', 'the', 'and', 'or', 'for', 'in', 'on', 'at', 'to', 'from', 'by',
+            'with', 'without', 'of', 'is', 'are', 'was', 'were', 'it', 'its', 'can',
+            'you', 'me', 'my', 'i', 'we', 'want', 'need', 'some', 'something', 'give',
+            'please', 'how', 'what', 'where', 'make', 'do', 'any', 'get', 'item', 'items'
+        ]);
 
         // Exact & Corrected term
         targetProductTerms.add(correctedQuery);
@@ -234,10 +246,10 @@ const STOP_WORDS = new Set([
         // Hinglish match
         if (HINGLISH_MAP[normalizedQuery]) {
             HINGLISH_MAP[normalizedQuery].forEach(term => targetProductTerms.add(term));
-            intentLabel = `Recognized vernacular term: "${trimmed}"`;
+            if (!semanticAnalysis.matched) intentLabel = `Recognized vernacular term: "${trimmed}"`;
         } else if (HINGLISH_MAP[correctedQuery]) {
             HINGLISH_MAP[correctedQuery].forEach(term => targetProductTerms.add(term));
-            intentLabel = `Recognized vernacular term: "${correctedQuery}"`;
+            if (!semanticAnalysis.matched) intentLabel = `Recognized vernacular term: "${correctedQuery}"`;
         }
 
         // Concept / Symptom / Recipe expansion (strict concept phrase match or query containing full concept)
@@ -247,7 +259,7 @@ const STOP_WORDS = new Set([
 
             if (isExactConcept || queryContainsConcept) {
                 items.forEach(item => targetProductTerms.add(item));
-                intentLabel = `Curated solution for: ${conceptKey.toUpperCase()}`;
+                if (!semanticAnalysis.matched) intentLabel = `Curated solution for: ${conceptKey.toUpperCase()}`;
             }
         }
 
